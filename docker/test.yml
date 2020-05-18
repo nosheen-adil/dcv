@@ -1,0 +1,24 @@
+version:
+  '3.3'
+services:
+  tests:
+    image:
+      dcv:latest
+    command:
+      bash -c "cd /src/build; ./dcv_tests;"
+    volumes:
+      - "../:/src"
+    network_mode:
+      host
+  influxdb:
+    image:
+      influxdb
+    ports:
+      - 8086:8086
+    volumes:
+      - "influxdb-storage:/var/lib/influxdb"
+    logging:
+      driver: "none"
+volumes:
+  influxdb-storage:
+    external: false    

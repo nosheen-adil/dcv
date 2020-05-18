@@ -1,0 +1,23 @@
+namespace dcv.models.fbs;
+
+table Box {
+	x:int;
+	y:int;
+	width:int;
+	height:int;
+}
+
+table Detection {
+	id:uint64;
+	conf:float;
+	label:string;
+	bbox:Box;
+}
+
+table Detections {
+	id:uint64;
+	timestamp:string;
+	data:[Detection];
+}
+
+root_type Detections;

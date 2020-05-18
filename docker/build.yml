@@ -1,0 +1,15 @@
+version:
+  '3.3'
+services:
+  build:
+    image:
+      dcv:latest
+    build:
+      context:
+        ../
+      dockerfile:
+        docker/Dockerfile
+    command:
+      bash -c "cd /src; mkdir -p build; cd build; cmake ..; make -j1;"
+    volumes:
+      - "../:/src"

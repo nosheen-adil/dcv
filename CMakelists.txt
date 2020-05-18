@@ -1,0 +1,61 @@
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
+project(dcv)
+
+option(DCV_BUILD_TESTS "Build the tests." ON)
+message(STATUS "DCV_BUILD_TESTS=${DCV_BUILD_TESTS}")
+
+set(DCV_SRCS
+  "src/detail/http.cpp"
+  "src/detail/utils.cpp"
+  "src/influxdb/client.cpp"
+  "src/influxdb/point.cpp"
+  "src/bus.cpp"
+  "src/manager.cpp"
+)
+
+set(DCV_PUBLIC_HEADERS_DIR "include/")
+set(DCV_PRIVATE_HEADERS_DIR "")
+
+find_package(cppzmq REQUIRED)
+find_package(OpenCV REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(RapidJSON REQUIRED)
+find_package(CURL REQUIRED)
+find_package(yaml-cpp REQUIRED)
+include_directories(${CURL_INCLUDE_DIR})
+
+set(C_LINK_OPTIONS "-lpthread -ldl -lrt")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -w")
+set(CPPZMQ_LINK_OPTIONS cppzmq)
+set(YAML_LINK_OPTIONS "-lyaml-cpp")
+
+set(DCV_LINK_OPTIONS
+	${C_LINK_OPTIONS}
+	${OpenCV_LIBS}
+	${CPPZMQ_LINK_OPTIONS}
+	${SPDLOG_LINK_OPTIONS}
+  ${CURL_LIBRARIES}
+  ${YAML_LINK_OPTIONS})
+
+add_library(dcv STATIC ${DCV_SRCS})
+target_link_libraries(dcv PUBLIC ${DCV_LINK_OPTIONS})
+target_include_directories(dcv
+  PUBLIC ${DCV_PUBLIC_HEADERS_DIR}
+  PRIVATE ${DCV_PRIVATE_HEADERS_DIR}
+)
+
+include(GNUInstallDirs)
+
+install(TARGETS dcv
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+install(DIRECTORY "include/" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+if(DCV_BUILD_TESTS)
+  set(DATA_INSTALL_DIR "${CMAKE_INSTALL_DATAROOTDIR}/dcv/data")
+  install(DIRECTORY "data/videos" "data/models" DESTINATION ${DATA_INSTALL_DIR})
+  include(cmake/Tests.cmake)
+endif()

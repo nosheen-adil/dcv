@@ -1,0 +1,16 @@
+namespace dcv.models.fbs;
+
+table Mat {
+	rows:int;
+	cols:int;
+	type:int;
+	data:[ubyte];
+}
+
+table Frame {
+	id:uint64;
+	timestamp:string;
+  mat:Mat;
+}
+
+root_type Frame;
